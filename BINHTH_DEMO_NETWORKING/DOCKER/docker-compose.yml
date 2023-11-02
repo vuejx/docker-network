@@ -1,0 +1,45 @@
+version: '3.8'
+
+networks:
+  test_network:
+    name: test_network
+    driver: bridge
+    external: true
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      driver: default
+      config:
+      - subnet: 2024:db8:1::/64
+
+services:
+
+  service_1:
+    build: ./service_1
+    restart: always
+    image: test/service_1:1.0
+    container_name: service_1
+    volumes:
+      - ./config:/app/config
+      - ./config/hosts:/etc/hosts
+    ports:
+      - "8080:3000"
+    networks:
+      test_network:
+        ipv6_address: 2024:db8:1::11
+    cap_add:
+      - NET_ADMIN
+
+  service_2:
+    build: ./service_2
+    restart: always
+    image: test/service_2:1.0
+    container_name: service_2
+    volumes:
+      - ./config:/app/config
+      - ./config/hosts:/etc/hosts
+    networks:
+      test_network:
+        ipv6_address: 2024:db8:1::12
+    cap_add:
+      - NET_ADMIN
